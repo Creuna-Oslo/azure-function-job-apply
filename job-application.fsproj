@@ -19,7 +19,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HelloYou.fs" />
+    <Compile Include="ApplicationHandler.fs" />
     <Compile Include="Functions.fs" />
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />

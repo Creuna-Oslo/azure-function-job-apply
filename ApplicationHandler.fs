@@ -1,10 +1,7 @@
-namespace MyFunctions
+namespace JobApplications
 
 open FsConfig
 open System.Text
-open Microsoft.WindowsAzure.Storage
-open Microsoft.WindowsAzure.Storage.Blob
-open FSharp.Data.HttpRequestHeaders
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Azure.WebJobs.Host
@@ -30,15 +27,16 @@ module Config =
            | NotSupported msg -> 
              failwith msg
     
-module HelloYou = 
+module ApplicationHandler = 
     type InputModel = {
         FirstName : string
         LastName : string
+        githubUser: string
+        phoneNo: string
     }
     exception InvalidInputException of string
 
     let run (req: HttpRequest) (log: TraceWriter) (blob : Stream) (name: string) =
-        log.Info "[Enter] HelloYou.run"
         let config = Config.values
         async {
             use stream = new StreamReader(req.Body)
@@ -52,5 +50,6 @@ module HelloYou =
                 log.Info "Received good input"
                 let bytes = Encoding.UTF8.GetBytes(output)
                 blob.Write(bytes, 0, bytes.Length)
+                return OkObjectResult (sprintf "Hello, %s %s %s %s" input.FirstName input.LastName config.SlackKey config.Storage) :> IActionResult
         }
         |> Async.RunSynchronously
