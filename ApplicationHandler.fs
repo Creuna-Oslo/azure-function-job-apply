@@ -33,7 +33,6 @@ module ApplicationHandler =
         contact: string
         message: string
     }
-    exception InvalidInputException of string
 
     let run (req: HttpRequest) (log: TraceWriter) (blob : Stream) (name: string) =
         let config = Config.values
@@ -42,7 +41,7 @@ module ApplicationHandler =
             let! body = stream.ReadToEndAsync() |> Async.AwaitTask
             let input = JsonConvert.DeserializeObject<InputModel>(body)
             if (String.IsNullOrWhiteSpace input.name) || (String.IsNullOrWhiteSpace input.contact) then
-                log.Info "Received by input"
+                name |> sprintf "Received by input %s" |> log.Info
                 return BadRequestObjectResult "Please pass a JSON object with contact and name fields" :> IActionResult
             else
                 let output = JsonConvert.SerializeObject(input)
