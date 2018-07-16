@@ -29,10 +29,9 @@ module Config =
     
 module ApplicationHandler = 
     type InputModel = {
-        FirstName : string
-        LastName : string
-        githubUser: string
-        phoneNo: string
+        name: string
+        contact: string
+        message: string
     }
     exception InvalidInputException of string
 
@@ -42,14 +41,14 @@ module ApplicationHandler =
             use stream = new StreamReader(req.Body)
             let! body = stream.ReadToEndAsync() |> Async.AwaitTask
             let input = JsonConvert.DeserializeObject<InputModel>(body)
-            if (String.IsNullOrWhiteSpace input.FirstName) || (String.IsNullOrWhiteSpace input.LastName) then
+            if (String.IsNullOrWhiteSpace input.name) || (String.IsNullOrWhiteSpace input.contact) then
                 log.Info "Received by input"
-                return BadRequestObjectResult "Please pass a JSON object with a FirstName and a LastName." :> IActionResult
+                return BadRequestObjectResult "Please pass a JSON object with contact and name fields" :> IActionResult
             else
                 let output = JsonConvert.SerializeObject(input)
                 log.Info "Received good input"
-                let bytes = Encoding.UTF8.GetBytes(output)
-                blob.Write(bytes, 0, bytes.Length)
-                return OkObjectResult (sprintf "Hello, %s %s %s %s" input.FirstName input.LastName config.SlackKey config.Storage) :> IActionResult
+                Encoding.UTF8.GetBytes(output) |> fun bytes ->
+                    blob.Write(bytes, 0, bytes.Length)
+                return OkResult() :> IActionResult
         }
         |> Async.RunSynchronously
