@@ -1,7 +1,9 @@
 namespace MyFunctions
 
 open FsConfig
-open FSharp.Data
+open System.Text
+open Microsoft.WindowsAzure.Storage
+open Microsoft.WindowsAzure.Storage.Blob
 open FSharp.Data.HttpRequestHeaders
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
@@ -13,7 +15,7 @@ open System
 module Config = 
     type Config = {
         Storage : string
-        slackKey : string
+        SlackKey : string
     }
 
     let values =
@@ -35,7 +37,7 @@ module HelloYou =
     }
     exception InvalidInputException of string
 
-    let run (req: HttpRequest) (log: TraceWriter) =
+    let run (req: HttpRequest) (log: TraceWriter) (blob : Stream) (name: string) =
         log.Info "[Enter] HelloYou.run"
         let config = Config.values
         async {
@@ -46,7 +48,9 @@ module HelloYou =
                 log.Info "Received by input"
                 return BadRequestObjectResult "Please pass a JSON object with a FirstName and a LastName." :> IActionResult
             else
+                let output = JsonConvert.SerializeObject(input)
                 log.Info "Received good input"
-                return OkObjectResult (sprintf "Hello, %s %s %s %s" input.FirstName input.LastName config.slackKey config.Storage) :> IActionResult
+                let bytes = Encoding.UTF8.GetBytes(output)
+                blob.Write(bytes, 0, bytes.Length)
         }
         |> Async.RunSynchronously
