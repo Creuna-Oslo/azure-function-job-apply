@@ -14,3 +14,11 @@ module Functions =
         input: Stream,
         log: TraceWriter) =
            ApplicationHandler.run req log input name
+    
+    [<FunctionName("SlackNotifier")>]
+     let SlackNotifier
+        ([<BlobTrigger("creunajobapplications/{fileName}")>]
+        blob: Stream,
+        log: TraceWriter) =
+           SlackHandler.run blob log
+    

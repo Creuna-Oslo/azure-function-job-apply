@@ -9,37 +9,13 @@ open System.IO
 open Newtonsoft.Json
 open System
 
-module Config = 
-    type Config = {
-        Storage : string
-        SlackKey : string
-    }
-
-    let values =
-         match EnvConfig.Get<Config>() with
-         | Ok config -> config
-         | Error error -> 
-           match error with
-           | NotFound envVarName -> 
-             failwithf "Environment variable %s not found" envVarName
-           | BadValue (envVarName, value) ->
-             failwithf "Environment variable %s has invalid value %s" envVarName value
-           | NotSupported msg -> 
-             failwith msg
-    
 module ApplicationHandler = 
-    type InputModel = {
-        name: string
-        contact: string
-        message: string
-    }
-
     let run (req: HttpRequest) (log: TraceWriter) (blob : Stream) (name: string) =
-        let config = Config.values
         async {
             use stream = new StreamReader(req.Body)
             let! body = stream.ReadToEndAsync() |> Async.AwaitTask
-            let input = JsonConvert.DeserializeObject<InputModel>(body)
+            let input = JsonConvert.DeserializeObject<Application.InputModel>(body)
+
             if (String.IsNullOrWhiteSpace input.name) || (String.IsNullOrWhiteSpace input.contact) then
                 name |> sprintf "Received by input %s" |> log.Info
                 return BadRequestObjectResult "Please pass a JSON object with contact and name fields" :> IActionResult
