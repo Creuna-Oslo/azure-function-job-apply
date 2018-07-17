@@ -1,7 +1,6 @@
 namespace JobApplications
 
 open FSharp.Data
-open FSharp.Data.HttpRequestHeaders
 open Microsoft.Azure.WebJobs.Host
 open System.IO
 
@@ -16,8 +15,17 @@ module SlackHandler =
                                 input.message 
                                 config.viewUrl 
                                 fileName
-            let res = Http.RequestString ( config.slackUrl, headers = [ ContentType HttpContentTypes.Json ], 
-                        body = TextRequest (sprintf "{\"text\": \"%s\"} " slackMessage))
-            log.Info("result" + res)
+            let! res =  Http.AsyncRequest(
+                          config.slackUrl,
+                          headers = [ HttpRequestHeaders.ContentType HttpContentTypes.Json ],
+                          httpMethod = "POST",
+                          body = TextRequest (sprintf "{\"text\": \"%s\"} " slackMessage))
+            match res.StatusCode with
+            | 200 -> log.Info "succesfull slack post!" 
+            | 304 -> failwith "succesfull, but not modified??"
+            | 404 -> failwith "Not found"
+            | 400 -> failwith "Bad request"
+            | 500 -> failwith "Error in view function"
+            | _ -> failwith "something is quite wrong"
 
         } |> Async.RunSynchronously

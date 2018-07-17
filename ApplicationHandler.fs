@@ -10,6 +10,7 @@ open System
 
 module ApplicationHandler = 
     let run (log: TraceWriter) (req: HttpRequest)  (blob : Stream) (name: string) =
+        log.Info <| "Entered applicationhandler: " + name
         async {
             let! input = Lib.decodeStream<Application.InputModel>(req.Body)
 
