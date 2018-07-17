@@ -4,6 +4,20 @@ open Microsoft.Azure.WebJobs
 open Microsoft.AspNetCore.Http
 open Microsoft.Azure.WebJobs.Host
 open System.IO
+open FsConfig
+
+module Config = 
+    let values = 
+        match EnvConfig.Get<Application.Config>() with
+        | Ok config -> config
+        | Error error -> 
+         match error with
+         | NotFound envVarName -> 
+           failwithf "Environment variable %s not found" envVarName
+         | BadValue (envVarName, value) ->
+           failwithf "Environment variable %s has invalid value %s" envVarName value
+         | NotSupported msg -> 
+           failwith msg
 
 module Functions =
     [<FunctionName("JobApplication")>]
@@ -13,12 +27,22 @@ module Functions =
         [<Blob("creunajobapplications/{sys.randguid}", FileAccess.Write)>]
         input: Stream,
         log: TraceWriter) =
-           ApplicationHandler.run req log input name
+           ApplicationHandler.run log req input name
     
     [<FunctionName("SlackNotifier")>]
-     let SlackNotifier
+    let SlackNotifier
         ([<BlobTrigger("creunajobapplications/{fileName}")>]
         blob: Stream,
+        fileName: string,
         log: TraceWriter) =
-           SlackHandler.run blob log
+           SlackHandler.run log blob fileName  Config.values
+
+    [<FunctionName("ClickView")>]
+    let ClickView
+        ([<HttpTrigger(Extensions.Http.AuthorizationLevel.Anonymous, "get", Route = "application/{name}")>]
+        req: System.Net.Http.HttpRequestMessage, name: string,
+        [<Blob("creunajobapplications/{name}", FileAccess.Read)>]
+        input: Stream,
+        log: TraceWriter) =
+           ClickView.run log req input name
     

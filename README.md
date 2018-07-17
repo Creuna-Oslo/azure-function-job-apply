@@ -3,7 +3,7 @@ An azure function that shuffles jobapplications to slack and blob storage
 
 ## Getting Started
 
-clone the repo, set `SLACK_KEY` and `STORAGE` in `local.settings.json`.
+clone the repo, set `SLACK_URL` and `VIEW_URL` in `local.settings.json`.
 Currently, you also need an azure storage acocunt, `creaunajobapplications`.
 
 ### Installing

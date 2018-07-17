@@ -1,6 +1,5 @@
 namespace JobApplications
 
-open FsConfig
 open System.Text
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Mvc
@@ -10,11 +9,9 @@ open Newtonsoft.Json
 open System
 
 module ApplicationHandler = 
-    let run (req: HttpRequest) (log: TraceWriter) (blob : Stream) (name: string) =
+    let run (log: TraceWriter) (req: HttpRequest)  (blob : Stream) (name: string) =
         async {
-            use stream = new StreamReader(req.Body)
-            let! body = stream.ReadToEndAsync() |> Async.AwaitTask
-            let input = JsonConvert.DeserializeObject<Application.InputModel>(body)
+            let! input = Lib.decodeStream<Application.InputModel>(req.Body)
 
             if (String.IsNullOrWhiteSpace input.name) || (String.IsNullOrWhiteSpace input.contact) then
                 name |> sprintf "Received by input %s" |> log.Info
