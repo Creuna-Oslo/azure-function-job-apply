@@ -19,8 +19,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Lib.fs" />
     <Compile Include="Application.fs" />
+    <Compile Include="Lib.fs" />
     <Compile Include="ClickView.fs" />
     <Compile Include="ApplicationHandler.fs" />
     <Compile Include="SlackHandler.fs" />

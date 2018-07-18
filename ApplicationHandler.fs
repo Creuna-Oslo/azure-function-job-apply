@@ -7,12 +7,14 @@ open Microsoft.Azure.WebJobs.Host
 open System.IO
 open Newtonsoft.Json
 open System
+open Application
+
 
 module ApplicationHandler = 
     let run (log: TraceWriter) (req: HttpRequest)  (blob : Stream) (name: string) =
         log.Info <| "Entered applicationhandler: " + name
         async {
-            let! input = Lib.decodeStream<Application.InputModel>(req.Body)
+            let! input = Lib.decodeStream<InputModel>(req.Body)
 
             if (String.IsNullOrWhiteSpace input.name) || (String.IsNullOrWhiteSpace input.contact) then
                 name |> sprintf "Received by input %s" |> log.Info
