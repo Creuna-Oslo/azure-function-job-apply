@@ -5,19 +5,22 @@ open Microsoft.AspNetCore.Http
 open Microsoft.Azure.WebJobs.Host
 open System.IO
 open FsConfig
+open Application
 
-module Config = 
-    let values = 
-        match EnvConfig.Get<Application.Config>() with
+module Config =
+    let getValues =
+        match EnvConfig.Get<ConfigData>() with
         | Ok config -> config
-        | Error error -> 
+        | Error error ->
          match error with
-         | NotFound envVarName -> 
+         | NotFound envVarName ->
            failwithf "Environment variable %s not found" envVarName
          | BadValue (envVarName, value) ->
            failwithf "Environment variable %s has invalid value %s" envVarName value
-         | NotSupported msg -> 
+         | NotSupported msg ->
            failwith msg
+
+    let values:Config = { slackUrl= SlackUrl getValues.slackUrl; viewUrl=ViewUrl getValues.viewUrl}
 
 module Functions =
     [<FunctionName("JobApplication")>]
@@ -28,14 +31,14 @@ module Functions =
         input: Stream,
         log: TraceWriter) =
            ApplicationHandler.run log req input name
-    
+
     [<FunctionName("SlackNotifier")>]
     let SlackNotifier
         ([<BlobTrigger("creunajobapplications/{fileName}")>]
         blob: Stream,
         fileName: string,
         log: TraceWriter) =
-           SlackHandler.run log blob fileName  Config.values
+           SlackHandler.run log blob fileName Config.values
 
     [<FunctionName("ClickView")>]
     let ClickView
@@ -45,4 +48,3 @@ module Functions =
         input: Stream,
         log: TraceWriter) =
            ClickView.run log req input name
-    

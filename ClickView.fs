@@ -11,8 +11,11 @@ module ClickView=
         log.Info("entered clickView: " + name)
         async {
             let! data = Lib.decodeStream<InputModel>(blob)
-            let response = req.CreateResponse(HttpStatusCode.OK)
-            response.Content <- new StringContent(toHtml(data), Encoding.UTF8, "text/html")
-            return response
+            match data with
+            | Ok input -> let response = req.CreateResponse(HttpStatusCode.OK)
+                          response.Content <- new StringContent(toHtml(input), Encoding.UTF8, "text/html")
+                          return response
+            | Error _ -> return req.CreateResponse(HttpStatusCode.InternalServerError)
+
         }
         |> Async.RunSynchronously

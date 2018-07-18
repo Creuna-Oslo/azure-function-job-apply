@@ -1,6 +1,5 @@
 namespace JobApplications
 
-open Chiron
 module Application =
 
     type ViewUrl = ViewUrl of string
@@ -11,11 +10,17 @@ module Application =
         viewUrl: ViewUrl
     }
 
+    type ConfigData = {
+        slackUrl: string
+        viewUrl: string
+    }
+
     type InputModel = {
         name: string
         contact: string
         message: string
     }
+
     let toSlack (input: InputModel) (ViewUrl viewUrl) fileName: string = 
         sprintf "A new job application! \n name: %s \n contact: %s \n message: %s \n <%s%s|View Application>!" 
             input.name 
