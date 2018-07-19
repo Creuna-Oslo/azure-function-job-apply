@@ -20,7 +20,7 @@ module Config =
          | NotSupported msg ->
            failwith msg
 
-    let values:Config = { slackUrl= SlackUrl getValues.slackUrl; viewUrl=ViewUrl getValues.viewUrl}
+    let values:Config = mkConfig getValues
 
 module Functions =
     [<FunctionName("JobApplication")>]

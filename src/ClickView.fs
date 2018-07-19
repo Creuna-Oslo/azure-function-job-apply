@@ -6,16 +6,20 @@ open System.Net
 open System.Net.Http
 open System.Text
 open Application
-module ClickView= 
+module ClickView=
     let run (log: TraceWriter) (req: HttpRequestMessage)  (blob : Stream) (name: string): HttpResponseMessage =
-        log.Info("entered clickView: " + name)
         async {
-            let! data = Lib.decodeStream<InputModel>(blob)
-            match data with
-            | Ok input -> let response = req.CreateResponse(HttpStatusCode.OK)
-                          response.Content <- new StringContent(toHtml(input), Encoding.UTF8, "text/html")
-                          return response
-            | Error _ -> return req.CreateResponse(HttpStatusCode.InternalServerError)
-
+            log.Info <| "Entered ClickView"
+            match blob with
+            | null ->
+                log.Error <| "Blob doesn't exist " + name
+                return req.CreateResponse(HttpStatusCode.NotFound)
+            | result ->
+                let! data = Lib.decodeStream<InputModel>(result)
+                match data with
+                | Ok input -> let response = req.CreateResponse(HttpStatusCode.OK)
+                              response.Content <- new StringContent(toHtml(input), Encoding.UTF8, "text/html")
+                              return response
+                | Error _ -> return req.CreateResponse(HttpStatusCode.ExpectationFailed)
         }
         |> Async.RunSynchronously
