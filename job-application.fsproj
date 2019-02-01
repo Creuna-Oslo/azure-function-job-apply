@@ -19,8 +19,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicationHandler.fs" />
-    <Compile Include="Functions.fs" />
+    <Compile Include="src/Application.fs" />
+    <Compile Include="src/Lib.fs" />
+    <Compile Include="src/ClickView.fs" />
+    <Compile Include="src/ApplicationHandler.fs" />
+    <Compile Include="src/SlackHandler.fs" />
+    <Compile Include="src/Functions.fs" />
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
 </Project>
