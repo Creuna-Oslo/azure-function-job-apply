@@ -1,5 +1,6 @@
 namespace JobApplications
 
+open Microsoft.Azure.WebJobs.Extensions.Storage
 open Microsoft.Azure.WebJobs
 open Microsoft.AspNetCore.Http
 open Microsoft.Azure.WebJobs.Host
