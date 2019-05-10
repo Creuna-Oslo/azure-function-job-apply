@@ -2,5 +2,6 @@
   "azureFunctions.projectRuntime": "~2",
   "azureFunctions.projectLanguage": "F#",
   "azureFunctions.templateFilter": "Core",
-  "azureFunctions.deploySubpath": "bin/Debug/netstandard2.0"
+  "azureFunctions.deploySubpath": "bin/Debug/netstandard2.0",
+  "FSharp.fsacRuntime": "netcore"
 }
