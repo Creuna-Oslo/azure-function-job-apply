@@ -2,8 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AzureFunctionsVersion>2
-    </AzureFunctionsVersion>
+    <AzureFunctionsVersion>V2</AzureFunctionsVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
